@@ -13,6 +13,20 @@ db.get('shows', (err, shows) => {
   }
 });
 
+function frame_buffer_put(token, fragment_number, tick) {
+  db.get(token+'-framebuffer', (err, framebuffer) => {
+    if (err) {
+      framebuffer = [];
+    }
+    framebuffer.push({fragment_number: fragment_number, tick: tick});
+    if (framebuffer.length >= 5) {
+      framebuffer.shift()
+    }
+    console.log(framebuffer);
+    db.put(token+'-framebuffer', framebuffer);
+  })
+}
+
 
 app.get('/', function (req, res) {
   const t = swig.compileFile(__dirname+'/views/plays.html');
@@ -30,8 +44,12 @@ function set_started (token, start_fragment, auth) {
   db.put(token+'-started', start_fragment)
 }
 
-function set_fullpoint (token, fragment, tick) {
-  db.put(token+'-state', {fragment: fragment, tick: tick})
+function set_fullpoint (token, cb) {
+  db.get(token+'-framebuffer', (err, framebuffer) => {
+    if (err) return cb();
+    const frame = framebuffer[0];
+    db.put(token+'-state', {fragment: frame.fragment_number, tick: frame.tick}, cb);
+  })
 }
 
 
@@ -48,6 +66,8 @@ app.get('/match/:token/:fragment_number/:frametype', function (req, res) {
 
 app.get('/match/:token/sync', function (req, res) {
   console.log("match sync!")
+  set_fullpoint(req.params.token, () => {
+
   db.get(req.params.token+'-state', (err, state) => {
     if (err) return res.status(404).send("not found");
     console.log(state)
@@ -63,9 +83,9 @@ app.get('/match/:token/sync', function (req, res) {
                 protocol: 4};
       console.log(r)
       res.send(r);
-
-    })
-  });
+      })
+    });
+  })
 });
 
 
@@ -87,10 +107,10 @@ app.post('/:token/:fragment_number/:frametype', function (req, res) {
      const p = fs.createWriteStream('datas/'+req.params.token+'_'+req.params.fragment_number+'_'+req.params.frametype);
      req.pipe(p)
      if (req.params.frametype == 'full') {
-       setTimeout(() => {
+       //setTimeout(() => {
+         frame_buffer_put(req.params.token, req.params.fragment_number, req.query.tick);
          console.log("Fragment", req.params.fragment_number, "for tick", req.query.tick);
-         set_fullpoint(req.params.token, req.params.fragment_number, req.query.tick);
-       }, 5000);
+       //}, 5000);
      }
      res.status(200).send("OK");
    });
