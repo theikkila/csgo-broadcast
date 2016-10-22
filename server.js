@@ -87,7 +87,7 @@ app.post('/:token/:fragment_number/:frametype', function (req, res) {
      const p = fs.createWriteStream('datas/'+req.params.token+'_'+req.params.fragment_number+'_'+req.params.frametype);
      req.pipe(p)
      if (req.params.frametype == 'full') {
-       setInterval(() => {
+       setTimeout(() => {
          console.log("Fragment", req.params.fragment_number, "for tick", req.query.tick);
          set_fullpoint(req.params.token, req.params.fragment_number, req.query.tick);
        }, 5000);
