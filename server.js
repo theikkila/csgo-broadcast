@@ -70,6 +70,10 @@ app.get('/match/:token/sync', function (req, res) {
 
 
 //  playcast "http://586f7685.ngrok.io/match/s85568392920768736t1477086968"
+app.post('/reset/:token/', (req, res) => {
+  db.del(req.params.token+'-started')
+  res.send("ACK");
+})
 
 app.post('/:token/:fragment_number/:frametype', function (req, res) {
    db.get(req.params.token+'-started', function (err, value) {
