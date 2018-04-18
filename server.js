@@ -100,22 +100,22 @@ app.post('/:token/:fragment_number/:frametype', function (req, res) {
      if (err && req.params.frametype != 'start') {
        return res.status(205).send("reset");
      }
-     if (req.params.frametype == 'start') {
-       console.log("starting", req.params.token, "with fragment_number", req.params.fragment_number);
-       set_started(req.params.token, req.params.fragment_number, req.headers['x-origin-auth']);
-     }
      const p = fs.createWriteStream('datas/'+req.params.token+'_'+req.params.fragment_number+'_'+req.params.frametype);
      req.pipe(p)
-     if (req.params.frametype == 'full') {
-       //setTimeout(() => {
-         frame_buffer_put(req.params.token, req.params.fragment_number, req.query.tick);
-         console.log("Fragment", req.params.fragment_number, "for tick", req.query.tick);
-       //}, 5000);
-     }
+     p.on('finish', function(){
+       if (req.params.frametype == 'start') {
+         console.log("starting", req.params.token, "with fragment_number", req.params.fragment_number);
+         set_started(req.params.token, req.params.fragment_number, req.headers['x-origin-auth']);
+       }
+       if (req.params.frametype == 'full') {
+           frame_buffer_put(req.params.token, req.params.fragment_number, req.query.tick);
+           console.log("Fragment", req.params.fragment_number, "for tick", req.query.tick);
+       }
+     });
      res.status(200).send("OK");
    });
 });
 
 app.listen(3000, function () {
-  console.log('Example app listening on port 3000!');
+  console.log('CSGO broadcast server listening on port 3000!');
 });
