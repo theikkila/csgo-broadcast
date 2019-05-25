@@ -59,8 +59,11 @@ app.get('/match/:token/:fragment_number/:frametype', function (req, res) {
     if (!exists) return res.status(404).send("not found");
     console.log("match play", req.params.token, req.params.fragment_number, req.params.frametype);
     res.setHeader('Content-Type', 'application/octet-stream')
-    fs.createReadStream(p)
-    .pipe(res)
+	var fragname = 'datas/'+req.params.token+'_'+req.params.fragment_number+'_'+req.params.frametype;
+	res.write(fragments[fragname], 'binary');
+	res.end(null, 'binary');
+    //fs.createReadStream(p)
+    //.pipe(res)
   })
 });
 
@@ -94,14 +97,16 @@ app.post('/reset/:token/', (req, res) => {
   db.del(req.params.token+'-started')
   res.send("ACK");
 })
-
+var fragments = {};
 app.post('/:token/:fragment_number/:frametype', function (req, res) {
    db.get(req.params.token+'-started', function (err, value) {
      if (err && req.params.frametype != 'start') {
        return res.status(205).send("reset");
      }
-     const p = fs.createWriteStream('datas/'+req.params.token+'_'+req.params.fragment_number+'_'+req.params.frametype);
-     req.pipe(p)
+	 var fragname = 'datas/'+req.params.token+'_'+req.params.fragment_number+'_'+req.params.frametype;
+	 fragments[fragname] = req.body;
+     //const p = fs.createWriteStream('datas/'+req.params.token+'_'+req.params.fragment_number+'_'+req.params.frametype);
+     //req.pipe(p)
      p.on('finish', function(){
        if (req.params.frametype == 'start') {
          console.log("starting", req.params.token, "with fragment_number", req.params.fragment_number);
