@@ -55,7 +55,7 @@ app.get('/match/:token/:fragment_number/:frametype', function (req, res) {
     //console.log("Fragment", req.params.fragment_number, "for tick", req.query.tick);
     p = fragments_delta[req.params.fragment_number]
   }
-  res.write(p, 'binary');
+  res.write(p);
   res.end(null, 'binary');
   //fs.createReadStream(p)
   //.pipe(res)
