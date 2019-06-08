@@ -106,12 +106,12 @@ var fragments_full = {};
 var fragments_delta = {};
 var syncdata = {};
 app.post('/:token/:fragment_number/:frametype', function (req, res) {
+  console.log("Fragment ", req.params.frametype, req.params.fragment_number, "for tick", req.query.tick);
   if (!syncdata.start) {
     res.status(205).send("Reset");
     console.log('reset at type : ',req.params.frametype)
   }
   else {
-    console.log("Fragment ", req.params.frametype, req.params.fragment_number, "for tick", req.query.tick);
     if(req.params.fragment_number){
       syncdata["fragment"] = req.params.fragment_number
     }
