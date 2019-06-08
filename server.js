@@ -65,7 +65,7 @@ app.get('/match/:token/sync', function (req, res) {
     rcvage: 1,
     fragment: parseInt(syncdata["fragment"]) - 5,
     signup_fragment: syncdata.start,
-    tps: 128,
+    tps: syncdata["tps"],
     protocol: 4
   }
   console.log(r)
@@ -105,6 +105,9 @@ app.post('/:token/:fragment_number/:frametype', function (req, res) {
       //}
       if(req.query.tick){
         syncdata["tick"] = req.query.tick
+      }
+      if(req.query.tps){
+        syncdata["tps"] = req.query.tps
       }
       if (req.params.frametype == 'full') {
         syncdata["fragment"] = req.params.fragment_number
