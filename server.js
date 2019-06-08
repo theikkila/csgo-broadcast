@@ -81,29 +81,18 @@ app.get('/match/:token/:fragment_number/:frametype', function (req, res) {
 
 app.get('/match/:token/sync', function (req, res) {
   console.log("match sync!")
-  set_fullpoint(req.params.token, () => {
-
-    db.get(req.params.token + '-state', (err, state) => {
-      if (err) return res.status(404).send("not found");
-      console.log(state)
-      db.get(req.params.token + '-started', (err, start) => {
-        if (err) return res.status(404).send("not found");
-        console.log(start)
-        const r = {
-          tick: parseInt(state.tick),
-          rtdelay: 1,
-          rcvage: 1,
-          fragment: parseInt(state.fragment),
-          signup_fragment: parseInt(start),
-          tps: 128,
-          protocol: 4
-        };
-        console.log(r)
-        res.send(r);
-      })
-    });
-  })
-});
+  const r = {
+    tick: parseInt(syncdata.tick),
+    rtdelay: 1,
+    rcvage: 1,
+    fragment: parseInt(syncdata.fragment),
+    signup_fragment: parseInt(start),
+    tps: 128,
+    protocol: 4
+  }
+  console.log(r)
+  res.send(r);
+})
 
 
 //  playcast "http://586f7685.ngrok.io/match/s85568392920768736t1477086968"
@@ -115,25 +104,35 @@ app.post('/reset/:token/', (req, res) => {
 var fragments_start = {};
 var fragments_full = {};
 var fragments_delta = {};
+var syncdata = {};
 var started = false;
 app.post('/:token/:fragment_number/:frametype', function (req, res) {
   if (!started) {
     res.status(205).send("Reset");
   }
-  if (req.params.frametype == 'start') {
-    console.log("starting", req.params.token, "with fragment_number", req.params.fragment_number);
-    fragments_start[req.params.fragment_number] = req.body
-    started = true
+  else {
+    if(req.params.fragment_number){
+      syncdata["fragment"] = req.params.fragment_number
+    }
+    if(req.query.tick){
+      syncdata["tick"] = req.query.tick
+    }
+    if (req.params.frametype == 'start') {
+      console.log("starting", req.params.token, "with fragment_number", req.params.fragment_number);
+      fragments_start[req.params.fragment_number] = req.body
+      started = true
+    }
+    if (req.params.frametype == 'full') {
+      console.log("Fragment", req.params.fragment_number, "for tick", req.query.tick);
+      fragments_full[req.params.fragment_number] = req.body
+    }
+    if (req.params.frametype == 'full') {
+      console.log("Fragment", req.params.fragment_number, "for tick", req.query.tick);
+      fragments_delta[req.params.fragment_number] = req.body
+    }
+    res.status(200).send("OK");
   }
-  if (req.params.frametype == 'full') {
-    console.log("Fragment", req.params.fragment_number, "for tick", req.query.tick);
-    fragments_full[req.params.fragment_number] = req.body
-  }
-  if (req.params.frametype == 'full') {
-    console.log("Fragment", req.params.fragment_number, "for tick", req.query.tick);
-    fragments_delta[req.params.fragment_number] = req.body
-  }
-  res.status(200).send("OK");
+
 });
 
 
