@@ -105,8 +105,8 @@ app.post('/:token/:fragment_number/:frametype', function (req, res) {
      }
 	 var fragname = 'datas/'+req.params.token+'_'+req.params.fragment_number+'_'+req.params.frametype;
 	 fragments[fragname] = req.body;
-     //const p = fs.createWriteStream('datas/'+req.params.token+'_'+req.params.fragment_number+'_'+req.params.frametype);
-     //req.pipe(p)
+     const p = fs.createWriteStream('datas/'+req.params.token+'_'+req.params.fragment_number+'_'+req.params.frametype);
+     req.pipe(p)
      p.on('finish', function(){
        if (req.params.frametype == 'start') {
          console.log("starting", req.params.token, "with fragment_number", req.params.fragment_number);
