@@ -42,7 +42,7 @@ app.get('/match/:token/:fragment_number/:frametype', function (req, res) {
     console.log("match play", req.params.token, req.params.fragment_number, req.params.frametype);
     res.setHeader('Content-Type', 'application/octet-stream')
     */
-  var p;
+  var p = Buffer.alloc(16, 0);
   if (req.params.frametype == 'start') {
     //console.log("starting", req.params.token, "with fragment_number", req.params.fragment_number);
     p = fragments_start[req.params.fragment_number]
@@ -55,7 +55,7 @@ app.get('/match/:token/:fragment_number/:frametype', function (req, res) {
     //console.log("Fragment", req.params.fragment_number, "for tick", req.query.tick);
     p = fragments_delta[req.params.fragment_number]
   }
-  res.write(p);
+  res.write(p, 'binary');
   res.end(null, 'binary');
   //fs.createReadStream(p)
   //.pipe(res)
