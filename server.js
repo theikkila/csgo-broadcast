@@ -54,18 +54,30 @@ function set_fullpoint (token, cb) {
 
 
 app.get('/match/:token/:fragment_number/:frametype', function (req, res) {
-  const p = 'datas/'+req.params.token+'_'+req.params.fragment_number+'_'+req.params.frametype;
+  /*const p = 'datas/'+req.params.token+'_'+req.params.fragment_number+'_'+req.params.frametype;
   fs.exists(p, (exists) => {
     if (!exists) return res.status(404).send("not found");
     console.log("match play", req.params.token, req.params.fragment_number, req.params.frametype);
     res.setHeader('Content-Type', 'application/octet-stream')
-	var fragname = 'datas/'+req.params.token+'_'+req.params.fragment_number+'_'+req.params.frametype;
-	res.write(fragments[fragname], 'binary');
+    */
+   var p;
+    if (req.params.frametype == 'start') {
+      //console.log("starting", req.params.token, "with fragment_number", req.params.fragment_number);
+      p = fragments_start[req.params.fragment_number]
+    }
+    if (req.params.frametype == 'full') {
+        //console.log("Fragment", req.params.fragment_number, "for tick", req.query.tick);
+        p = fragments_full[req.params.fragment_number]
+    }
+    if (req.params.frametype == 'full') {
+     //console.log("Fragment", req.params.fragment_number, "for tick", req.query.tick);
+     p = fragments_delta[req.params.fragment_number]
+   }
+	res.write(p, 'binary');
 	res.end(null, 'binary');
     //fs.createReadStream(p)
     //.pipe(res)
-  })
-});
+})
 
 app.get('/match/:token/sync', function (req, res) {
   console.log("match sync!")
@@ -97,27 +109,36 @@ app.post('/reset/:token/', (req, res) => {
   db.del(req.params.token+'-started')
   res.send("ACK");
 })
-var fragments = {};
+
+var fragments_start = {};
+var fragments_full = {};
+var fragments_delta = {};
 app.post('/:token/:fragment_number/:frametype', function (req, res) {
    db.get(req.params.token+'-started', function (err, value) {
      if (err && req.params.frametype != 'start') {
        return res.status(205).send("reset");
      }
-	 var fragname = 'datas/'+req.params.token+'_'+req.params.fragment_number+'_'+req.params.frametype;
-	 fragments[fragname] = req.body;
+	 //var fragname = 'datas/'+req.params.token+'_'+req.params.fragment_number+'_'+req.params.frametype;
+	 //fragments[fragname] = req.body;
      /*const p = fs.createWriteStream('datas/'+req.params.token+'_'+req.params.fragment_number+'_'+req.params.frametype);
      req.pipe(p)
      p.on('finish', function(){
+    */
        if (req.params.frametype == 'start') {
          console.log("starting", req.params.token, "with fragment_number", req.params.fragment_number);
-         set_started(req.params.token, req.params.fragment_number, req.headers['x-origin-auth']);
+         fragments_start[req.params.fragment_number] = req.body
        }
        if (req.params.frametype == 'full') {
-           frame_buffer_put(req.params.token, req.params.fragment_number, req.query.tick);
            console.log("Fragment", req.params.fragment_number, "for tick", req.query.tick);
+           fragments_full[req.params.fragment_number] = req.body
        }
+       if (req.params.frametype == 'full') {
+        console.log("Fragment", req.params.fragment_number, "for tick", req.query.tick);
+        fragments_delta[req.params.fragment_number] = req.body
+      }
+       
      });
-     */
+     
      res.status(200).send("OK");
    });
 });
