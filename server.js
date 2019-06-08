@@ -82,11 +82,11 @@ app.get('/match/:token/:fragment_number/:frametype', function (req, res) {
 app.get('/match/:token/sync', function (req, res) {
   console.log("match sync!")
   const r = {
-    tick: parseInt(syncdata.tick),
+    tick: parseInt(syncdata["tick"]),
     rtdelay: 1,
     rcvage: 1,
-    fragment: parseInt(syncdata.fragment),
-    signup_fragment: parseInt(syncdata.start),
+    fragment: parseInt(syncdata["fragment"]),
+    signup_fragment: parseInt(syncdata["start"]),
     tps: 128,
     protocol: 4
   }
@@ -105,9 +105,8 @@ var fragments_start = {};
 var fragments_full = {};
 var fragments_delta = {};
 var syncdata = {};
-var started = false;
 app.post('/:token/:fragment_number/:frametype', function (req, res) {
-  if (!started) {
+  if (!syncdata["start"]) {
     res.status(205).send("Reset");
   }
   else {
