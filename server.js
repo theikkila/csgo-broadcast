@@ -68,7 +68,7 @@ app.get('/match/:token/sync', function (req, res) {
     rtdelay: 1,
     rcvage: 1,
     fragment: parseInt(syncdata["fragment"]),
-    signup_fragment: parseInt(syncdata.start),
+    signup_fragment: syncdata.start,
     tps: 128,
     protocol: 4
   }
