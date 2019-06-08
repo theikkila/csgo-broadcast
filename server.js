@@ -100,13 +100,14 @@ app.post('/:token/:fragment_number/:frametype', function (req, res) {
       console.log('reset at type :', req.params.frametype)
     }
     else {
-      if(req.params.fragment_number){
-        syncdata["fragment"] = req.params.fragment_number
-      }
+      //if(req.params.fragment_number){
+        //syncdata["fragment"] = req.params.fragment_number
+      //}
       if(req.query.tick){
         syncdata["tick"] = req.query.tick
       }
       if (req.params.frametype == 'full') {
+        syncdata["fragment"] = req.params.fragment_number
         fragments_full[req.params.fragment_number] = req.body
       }
       if (req.params.frametype == 'delta') {
