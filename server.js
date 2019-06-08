@@ -108,7 +108,7 @@ var syncdata = {};
 app.post('/:token/:fragment_number/:frametype', function (req, res) {
   if (!syncdata.start) {
     res.status(205).send("Reset");
-    console.log('reset')
+    console.log('reset at type : ',req.params.frametype)
   }
   else {
     console.log("Fragment ", req.params.frametype, req.params.fragment_number, "for tick", req.query.tick);
@@ -118,7 +118,7 @@ app.post('/:token/:fragment_number/:frametype', function (req, res) {
     if(req.query.tick){
       syncdata["tick"] = req.query.tick
     }
-    if (req.params.frametype == 'start') {
+    if (req.params.frametype == "start") {
       syncdata.start = req.query.starttick
       fragments_start[req.params.fragment_number] = req.body
     }
