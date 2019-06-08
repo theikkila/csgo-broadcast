@@ -35,24 +35,6 @@ app.get('/', function (req, res) {
   });
 });
 
-function set_started(token, start_fragment, auth) {
-  db.get('shows', (err, shows) => {
-    let s = shows.shows;
-    s.push({ token: token, timestamp: (new Date().toJSON()), auth: auth })
-    db.put('shows', { shows: s });
-  });
-  db.put(token + '-started', start_fragment)
-}
-
-function set_fullpoint(token, cb) {
-  db.get(token + '-framebuffer', (err, framebuffer) => {
-    if (err) return cb();
-    const frame = framebuffer[0];
-    db.put(token + '-state', { fragment: frame.fragment_number, tick: frame.tick }, cb);
-  })
-}
-
-
 app.get('/match/:token/:fragment_number/:frametype', function (req, res) {
   /*const p = 'datas/'+req.params.token+'_'+req.params.fragment_number+'_'+req.params.frametype;
   fs.exists(p, (exists) => {
@@ -108,7 +90,12 @@ var syncdata = {};
 var started = false;
 app.post('/:token/:fragment_number/:frametype', function (req, res) {
   console.log("Fragment ", req.params.frametype, req.params.fragment_number, "for tick", req.query.tick);
-  if (!started) {
+  if (req.params.frametype == "start") {
+    syncdata.start = req.query.starttick
+    fragments_start[req.params.fragment_number] = req.body
+    started = true;
+  }
+  else if (!started) {
     res.status(205).send("Reset");
     console.log('reset at type :',req.params.frametype)
   }
@@ -118,11 +105,6 @@ app.post('/:token/:fragment_number/:frametype', function (req, res) {
     }
     if(req.query.tick){
       syncdata["tick"] = req.query.tick
-    }
-    if (req.params.frametype == "start") {
-      syncdata.start = req.query.starttick
-      fragments_start[req.params.fragment_number] = req.body
-      started = true;
     }
     if (req.params.frametype == 'full') {
       fragments_full[req.params.fragment_number] = req.body
