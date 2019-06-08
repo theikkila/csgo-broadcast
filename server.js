@@ -72,7 +72,7 @@ app.get('/match/:token/sync', function (req, res) {
   res.send(r);
 })
 
-
+syncdata["tps"] = 32;
 //  playcast "http://586f7685.ngrok.io/match/s85568392920768736t1477086968"
 app.post('/reset/:token/', (req, res) => {
   //db.del(req.params.token + '-started')
