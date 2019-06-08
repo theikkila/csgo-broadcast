@@ -13,7 +13,7 @@ app.get('/', function (req, res) {
   });
 });
 */
-app.use(bodyParser.raw({ type:'*/*',limit:'50mb',extended: true }));
+app.use(bodyParser.raw({ type:'*/*',limit:'512mb',extended: true }));
 
 app.get('/match/:token/:fragment_number/:frametype', function (req, res) {
   /*const p = 'datas/'+req.params.token+'_'+req.params.fragment_number+'_'+req.params.frametype;
@@ -46,11 +46,15 @@ app.get('/match/:token/:fragment_number/:frametype', function (req, res) {
     //res.write(fragments_full[req.params.fragment_number],'binary')
     p = fragments_full[req.params.fragment_number]
   }
-  console.log(p)
-  res.write(p, 'binary');
-  res.end(null, 'binary');
-  //fs.createReadStream(p)
-  //.pipe(res)
+  if (!p) {
+    //console.log(p)
+    res.send(404);
+  }
+  else {
+    //console.log(p)
+    res.write(p, 'binary');
+    res.end(null, 'binary');
+  }
 })
 
 app.get('/match/:token/sync', function (req, res) {
