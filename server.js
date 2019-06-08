@@ -88,7 +88,7 @@ var started = false;
 syncdata.tps = 32;
 app.post('/:token/:fragment_number/:frametype', function (req, res) {
   //console.log(req.body)
-  console.log("Fragment ", req.params.frametype, req.params.fragment_number, "for tick", req.query.tick);
+  console.log(`Fragment token : ${req.params.token}, type : ${req.params.frametype},number : ${req.params.fragment_number}, tick : ${req.query.tick}`);
   if (req.params.frametype == "start") {
     syncdata.start = req.params.fragment_number
     fragments_start[req.params.fragment_number] = req.body
