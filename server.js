@@ -86,7 +86,7 @@ app.get('/match/:token/sync', function (req, res) {
     rtdelay: 1,
     rcvage: 1,
     fragment: parseInt(syncdata.fragment),
-    signup_fragment: parseInt(start),
+    signup_fragment: parseInt(syncdata.start),
     tps: 128,
     protocol: 4
   }
@@ -118,6 +118,7 @@ app.post('/:token/:fragment_number/:frametype', function (req, res) {
       syncdata["tick"] = req.query.tick
     }
     if (req.params.frametype == 'start') {
+      syncdata["start"] = req.query.starttick
       console.log("starting", req.params.token, "with fragment_number", req.params.fragment_number);
       fragments_start[req.params.fragment_number] = req.body
       started = true
