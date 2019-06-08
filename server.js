@@ -105,7 +105,7 @@ app.post('/:token/:fragment_number/:frametype', function (req, res) {
      }
 	 var fragname = 'datas/'+req.params.token+'_'+req.params.fragment_number+'_'+req.params.frametype;
 	 fragments[fragname] = req.body;
-     const p = fs.createWriteStream('datas/'+req.params.token+'_'+req.params.fragment_number+'_'+req.params.frametype);
+     /*const p = fs.createWriteStream('datas/'+req.params.token+'_'+req.params.fragment_number+'_'+req.params.frametype);
      req.pipe(p)
      p.on('finish', function(){
        if (req.params.frametype == 'start') {
@@ -117,6 +117,7 @@ app.post('/:token/:fragment_number/:frametype', function (req, res) {
            console.log("Fragment", req.params.fragment_number, "for tick", req.query.tick);
        }
      });
+     */
      res.status(200).send("OK");
    });
 });
